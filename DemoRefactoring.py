@@ -7,6 +7,8 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 from PyQt5 import uic
 
+form_class = uic.loadUiType("DemoForm3.ui")[0]
+
 # SQLite 데이터베이스 처리 클래스
 class productDB:
     def __init__(self, db_name="ProductList.db"):
@@ -34,20 +36,20 @@ class productDB:
         return self.cursor.fetchall()
     
 # UI 클래스.
-class ProductUI(QMainWindow):
+class ProductUI(QMainWindow, form_class):
     def __init__(self):
         super().__init__()
         self.db = productDB()
 
-        uic.loadUiType("DemoForm3.ui")[0]
+        self.setupUi(self) #UI 내부요소들을 현재 클래스에 초기화
 
         # 버튼 연결.
-        self.pushButton.clicked.connect(self.get_product)
+        self.pushButton.clicked.connect(self.get_products)
         self.pushButton_2.clicked.connect(self.add_product)
         self.pushButton_3.clicked.connect(self.remove_product)
         self.pushButton_4.clicked.connect(self.update_product)
 
-        self.tabelWidget.doubleClicked.connect(self.fill_input_fields)
+        self.tableWidget.doubleClicked.connect(self.fill_input_fields)
 
         self.init_table()
         self.get_products()
@@ -61,7 +63,7 @@ class ProductUI(QMainWindow):
         self.tableWidget.setColumnWidth(2,100)
 
         self.tableWidget.setHorizontalHeaderLabels(["제품ID", "제품명", "가격"])
-        self.tableWidget.setTabkeyNavigation(False)
+        self.tableWidget.setTabKeyNavigation(False)
 
     def show_message(self, text, title="알림"):
         QMessageBox.information(self, title, text)
@@ -110,7 +112,7 @@ class ProductUI(QMainWindow):
 
     def get_products(self):
         self.tableWidget.clearContents()
-        products = self.db.fatch_all()
+        products = self.db.fetch_all()
 
         for row, (pid, name, price) in  enumerate(products):
             item_id = QTableWidgetItem(str(pid))
@@ -119,8 +121,8 @@ class ProductUI(QMainWindow):
             item_id.setTextAlignment(Qt.AlignRight)
 
             self.tableWidget.setItem(row, 0, item_id)
-            self.tablewidget.setItem(row, 1, QTableWidgetItem(name))
-            self.tablewidget.setItem(row, 2, item_price)
+            self.tableWidget.setItem(row, 1, QTableWidgetItem(name))
+            self.tableWidget.setItem(row, 2, item_price)
 
     def fill_input_fields(self):
         row = self.tableWidget.currentRow()
@@ -153,4 +155,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = ProductUI()
     window.show()
-    sys.exit(app.exec_)
+    sys.exit(app.exec_())
